@@ -1,0 +1,36 @@
+.nav-item{
+    margin-left: 1rem;
+    cursor: pointer;
+}
+
+body::-webkit-scrollbar {
+    width: 0.5rem;               /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background: rgb(155, 155, 155);        /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgb(70, 70, 70);    /* color of the scroll thumb */
+    border-radius: 2rem;
+}
+
+.project-box {
+    box-shadow: 0 0 2rem 0 #888888;
+    background-color: white;
+    width:100%;
+    padding:1rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    height:100%;
+    text-align: justify!important;
+}
+
+.project-box:hover {
+    box-shadow: 0 0 3rem 0 #888888;
+}
+
+.project-box:focus {
+    box-shadow: 0 0 3rem 0 #6b6b6b;
+}

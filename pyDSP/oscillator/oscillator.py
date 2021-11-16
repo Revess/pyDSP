@@ -1,6 +1,7 @@
 from math import pi
+import numpy as np
 
-class Wavetable:
+class Oscillator:
     def __init__(self,frequency,sampleRate) -> None:
         self.TWO_PI = 2*pi
         self.phase = 0
