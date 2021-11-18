@@ -10,12 +10,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="./js/index.js"></script>
+    <script src="./js/interactdata.js"></script>
+    <script src="./js/cardchanges.js"></script>
     <link rel="stylesheet" href="./css/index.css">
     </script>
 </head>
 
-<body onload="addOscillator()">
+<body onload="addCard('Oscillator');addCard('Modulator')">
     <nav class="navbar navbar-expand sticky-top navbar navbar-light" style="background-color: white;" id="navbar">
         <a class="navbar-brand" style="cursor:pointer;" href="/#title">pyDSP</a>
         <div class="navbar-items">
@@ -23,12 +24,13 @@
                 <li class="nav-item dropdown">
                     <i href="#" id="navbarDropdown" data-toggle="dropdown" class="fa-solid fa-plus"></i>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" onclick="addOscillator()">Oscillator</a>
+                        <a class="dropdown-item" onclick="addCard(this.innerHTML)">Oscillator</a>
+                        <a class="dropdown-item" onclick="addCard(this.innerHTML)">Modulator</a>
                         <!-- <div class="dropdown-divider"></div> -->
                     </div>
                 </li>
                 <li class="nav-item">
-                    <i class="fa-solid fa-minus"></i>
+                    <i class="fa-solid fa-minus" onclick="removeObject()"></i>
                 </li>
             </ul>
         </div>
