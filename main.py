@@ -2,7 +2,7 @@ import pyaudio
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from pyDSP.oscillator.synth import Synth
+from pyDSP.synth.synth import Synth
 from flask import Flask
 from flask import request
 import threading as td
@@ -15,21 +15,35 @@ def index():
     if request.method == "POST":
         data = list(request.get_json().values())[0]
         if "newNode" in data[0]:
-            processor.addAudioUnit(data[1],data[2].lower())
+            processor.addAudioUnit(data[1].lower(),data[2].lower())
         elif "removeNode" in data[0]:
-            processor.removeAudioUnit(data[1])
+            processor.removeAudioUnit(data[1].lower())
         elif "oscFrequency" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"frequency",data[2])
+            processor.changeAudioUnitProperty(data[1].lower(),"frequency",data[2].lower())
         elif "oscVolume" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"volume",data[2])
+            processor.changeAudioUnitProperty(data[1].lower(),"volume",data[2].lower())
         elif "oscAngle" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"angle",data[2])
+            processor.changeAudioUnitProperty(data[1].lower(),"angle",data[2].lower())
         elif "oscDetune" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"detune",data[2])
+            processor.changeAudioUnitProperty(data[1].lower(),"detune",data[2].lower())
         elif "oscVoice" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"voices",data[2])
+            processor.changeAudioUnitProperty(data[1].lower(),"voices",data[2].lower())
         elif "oscWave" in data[0]:
-            processor.changeAudioUnitProperty(data[1],"waveform",data[2].lower())
+            processor.changeAudioUnitProperty(data[1].lower(),"waveform",data[2].lower())
+        elif "oscFm" in data[0]:
+            processor.changeAudioUnitProperty(data[1].lower(),"Fm",data[2].lower())
+        elif "oscAm" in data[0]:
+            processor.changeAudioUnitProperty(data[1].lower(),"Am",data[2].lower())
+        elif "oscRm" in data[0]:
+            processor.changeAudioUnitProperty(data[1].lower(),"Rm",data[2].lower())
+        elif "oscFMInput" in data[0] and data[2] is not None:
+            processor.changeAudioUnitProperty(data[1].lower(),"FMInput",data[2].lower())
+        elif "oscAMInput" in data[0] and data[2] is not None:
+            processor.changeAudioUnitProperty(data[1].lower(),"AMInput",data[2].lower())
+        elif "oscRMInput" in data[0] and data[2] is not None:
+            processor.changeAudioUnitProperty(data[1].lower(),"RMInput",data[2].lower())
+        elif "oscOutput" in data[0]:
+            processor.changeAudioUnitOutput(data[1].lower(),data[2].lower())
         return "done"
     else:
         return app.send_static_file("./index.html")
@@ -65,8 +79,32 @@ class AudioProcessor:
     def removeAudioUnit(self,unitID):
         del self.audioUnits[unitID]
 
+    def findAudioUnit(self,unitID):
+        if unitID not in self.audioUnits.keys():
+            for key in self.audioUnits.keys():
+                for subKey in self.audioUnits[key].getModulators().keys():
+                    if subKey == unitID:
+                        return key
+        else:
+            return unitID
+
     def changeAudioUnitProperty(self,unitID,property,value):
-        self.audioUnits[unitID].changeProperty(property,value)
+        foundKey = self.findAudioUnit(unitID)
+        if foundKey == unitID:
+            self.audioUnits[unitID].changeProperty(property,value)
+        else:
+            self.audioUnits[foundKey].modifyModulator(unitID,property,value)
+
+    def changeAudioUnitOutput(self,unitID,value):
+        if unitID not in self.audioUnits.keys() and "direct out" in value:
+            for key,audioUnit in self.audioUnits.items():
+                if unitID in audioUnit.getModulators().keys():
+                    self.audioUnits.update({unitID:audioUnit.getModulatorValue(unitID)})
+                    audioUnit.removeInput(unitID)
+                    break
+        elif value in self.audioUnits.keys():
+            self.audioUnits[value].addInput(unitID,self.audioUnits[unitID])
+            del self.audioUnits[unitID]
     
 if __name__ == "__main__":
     processor = AudioProcessor()

@@ -1,32 +1,34 @@
 <div class="project-box" tabindex="1" onclick="focusBox(this)">
-  <div class="row p-2">
+  <div class="row pb-2">
     <div class="col-md-12 text-center">
       <h4>Oscillator</h4>
     </div>
   </div>
-  <div class="col-md-12 text-center waveform">
-    <div class="dropdown">
-      <button class="btn btn-secondary bnt-md dropdown-toggle w-50" type="button" id="dropdownMenuButton"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Sine
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" onclick="changeWaveForm(this);">Saw</a>
-        <a class="dropdown-item" onclick="changeWaveForm(this);">Sine</a>
-        <a class="dropdown-item" onclick="changeWaveForm(this);">Triangle</a>
-        <a class="dropdown-item" onclick="changeWaveForm(this);">Square</a>
+  <div class="row pb-2">
+    <div class="col-md-12 text-center waveform">
+      <div class="dropdown">
+        <button class="btn btn-secondary bnt-md dropdown-toggle w-50" type="button" id="dropdownMenuButton"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sine
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" onclick="changeWaveForm(this);">Saw</a>
+          <a class="dropdown-item" onclick="changeWaveForm(this);">Sine</a>
+          <a class="dropdown-item" onclick="changeWaveForm(this);">Triangle</a>
+          <a class="dropdown-item" onclick="changeWaveForm(this);">Square</a>
+        </div>
       </div>
     </div>
   </div>
-  <div class="row p-2">
-    <div class="col-md-6 align-items-middle my-auto freq-slider">
+  <div class="row pb-2">
+    <div class="col-md-6 align-items-middle freq-slider">
       <label>Voices</label>
       <input type="number" maxlength="4" value="1" min="1" max="16" step="1" class="w-10"
         oninput="this.nextElementSibling.value = this.value; voiceChange(this)">
       <input type="range" class="w-100" value="1" min="1" max="16" step="1"
         oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; voiceChange(this);">
     </div>
-    <div class="col-md-6 align-items-middle my-auto vol-slider">
+    <div class="col-md-6 align-items-middle vol-slider">
       <label>Detune</label>
       <input type="number" maxlength="4" value="0.5" min="0" max="1" step="0.001" class="w-10"
         oninput="this.nextElementSibling.value = this.value; detuneChange(this)">
@@ -34,36 +36,102 @@
         oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; detuneChange(this);">
     </div>
   </div>
-  <div class="row p-2">
-    <div class="col-md-12 align-items-middle my-auto freq-slider">
+  <div class="row pb-2">
+    <div class="col-md-12 align-items-middle freq-slider">
       <label>Frequency</label>
       <input type="number" maxlength="4" value="220" min="0" max="880" step="0.001" class="w-10"
         oninput="this.nextElementSibling.value = this.value; frequencyChange(this)">
       <input type="range" class="w-100" value="220" min="1" max="880" step="0.001"
         oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; frequencyChange(this);">
     </div>
-    <div class="col-md-12 align-items-middle my-auto vol-slider">
+    <div class="col-md-12 align-items-middle vol-slider">
       <label>Volume</label>
       <input type="number" maxlength="4" value="0.5" min="0" max="1" step="0.001" class="w-10"
         oninput="this.nextElementSibling.value = this.value; volumeChange(this)">
       <input type="range" class="w-100" value="0.5" min="0" max="1" step="0.001"
         oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; volumeChange(this);">
     </div>
-    <div class="col-md-12 align-items-middle my-auto angle-slider hidden-element">
+    <div class="col-md-12 align-items-middle angle-slider hidden-element">
       <label>Angle</label>
       <input type="number" maxlength="4" value="0.5" min="0" max="1" step="0.001" class="w-10"
         oninput="this.nextElementSibling.value = this.value; angleChange(this)">
       <input type="range" class="w-100" value="0.5" min="0" max="1" step="0.001"
         oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; angleChange(this);">
     </div>
-    <div class="col-md-6 text-center output">
+  </div>
+  <div class="row pb-2">
+    <div class="col-xl-12 modulators">
+      <div class="row FM-slider">
+        <div class="col-sm-3 my-auto">
+          <div class="dropdown">
+            <button class="btn btn-secondary bnt-md dropdown-toggle" type="button" id="dropdownMenuButton"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              FM
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" onclick="changeFMInput(this);">None</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-9">
+          <label>FM</label>
+          <input type="number" maxlength="4" value="0" min="0" max="1" step="0.001"
+            oninput="this.nextElementSibling.value = this.value; FMChange(this)">
+          <input type="range" class="w-100" value="0" min="0" max="1" step="0.001"
+            oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; FMChange(this);">
+        </div>
+      </div>
+      <div class="row AM-slider">
+        <div class="col-sm-3 my-auto">
+          <div class="dropdown">
+            <button class="btn btn-secondary bnt-md dropdown-toggle" type="button" id="dropdownMenuButton"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              AM
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" onclick="changeAMInput(this);">None</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-9">
+          <label>AM</label>
+          <input type="number" maxlength="4" value="0" min="0" max="1" step="0.001"
+            oninput="this.nextElementSibling.value = this.value; AMChange(this)">
+          <input type="range" class="w-100" value="0" min="0" max="1" step="0.001"
+            oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; AMChange(this);">
+        </div>
+      </div>
+      <div class="row RM-slider">
+        <div class="col-sm-3 my-auto">
+          <div class="dropdown">
+            <button class="btn btn-secondary bnt-md dropdown-toggle" type="button" id="dropdownMenuButton"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              RM
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" onclick="changeRMInput(this);">None</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-9">
+          <label>RM</label>
+          <input type="number" maxlength="4" value="0" min="0" max="1" step="0.001"
+            oninput="this.nextElementSibling.value = this.value; RMChange(this)">
+          <input type="range" class="w-100" value="0" min="0" max="1" step="0.001"
+            oninput="if(this.value > this.max){this.value = this.max} else if(this.value < this.min){ this.value = this.min};this.previousElementSibling.value = this.value; RMChange(this);">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row pb-2">
+    <div class="col-xl-12 text-center output">
       <div class="dropdown">
         <button class="btn btn-secondary bnt-md dropdown-toggle" type="button" id="dropdownMenuButton"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Output
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" onclick="changeWaveForm(this);">Direct Out</a>
+          <a class="dropdown-item" onclick="changeOutput(this);">Direct Out</a>
         </div>
       </div>
     </div>
