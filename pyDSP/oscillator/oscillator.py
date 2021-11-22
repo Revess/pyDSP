@@ -3,9 +3,12 @@ from random import random
 import numpy as np
 
 class Oscillator:
-    def __init__(self,frequency,sampleRate,angle=0.5,volume=1) -> None:
+    def __init__(self,frequency,sampleRate,angle=0.5,volume=1,phase=None) -> None:
         self.TWO_PI = 2*pi
-        self.phase = random()
+        if phase is not None:
+            self.phase = phase
+        else:
+            self.phase = random()
         self.frequency = frequency
         self.sampleRate = sampleRate
         self.step = self.frequency/self.sampleRate
@@ -23,7 +26,7 @@ class Oscillator:
         return self.calculate()*self.volume
 
     def calculate(self):
-        pass
+        return self.phase
 
     def setFrequecy(self,frequency):
         self.frequency = frequency

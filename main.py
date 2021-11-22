@@ -1,138 +1,58 @@
 import pyaudio
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from pyDSP.synth.synth import Synth
-from flask import Flask
-from flask import request
 import threading as td
-
-app = Flask(__name__,static_url_path="",static_folder="./UI/",template_folder="./UI/")
-SAMPLERATE = 44100
-
-@app.route("/", methods=['GET','POST'])
-def index():
-    if request.method == "POST":
-        data = list(request.get_json().values())[0]
-        if "newNode" in data[0]:
-            processor.addAudioUnit(data[1].lower(),data[2].lower())
-        elif "removeNode" in data[0]:
-            processor.removeAudioUnit(data[1].lower())
-        elif "oscFrequency" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"frequency",data[2].lower())
-        elif "oscVolume" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"volume",data[2].lower())
-        elif "oscAngle" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"angle",data[2].lower())
-        elif "oscDetune" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"detune",data[2].lower())
-        elif "oscVoice" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"voices",data[2].lower())
-        elif "oscWave" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"waveform",data[2].lower())
-        elif "oscFm" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"Fm",data[2].lower())
-        elif "oscAm" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"Am",data[2].lower())
-        elif "oscRm" in data[0]:
-            processor.changeAudioUnitProperty(data[1].lower(),"Rm",data[2].lower())
-        elif "oscFMInput" in data[0] and data[2] is not None:
-            processor.changeAudioUnitProperty(data[1].lower(),"FMInput",data[2].lower())
-        elif "oscAMInput" in data[0] and data[2] is not None:
-            processor.changeAudioUnitProperty(data[1].lower(),"AMInput",data[2].lower())
-        elif "oscRMInput" in data[0] and data[2] is not None:
-            processor.changeAudioUnitProperty(data[1].lower(),"RMInput",data[2].lower())
-        elif "oscOutput" in data[0]:
-            processor.changeAudioUnitOutput(data[1].lower(),data[2].lower())
-        return "done"
-    else:
-        return app.send_static_file("./index.html")
+from pyDSP.oscillator.waveforms import Sine
+from pyDSP.pitchShifter import PitchShifter
+from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
 
 class AudioProcessor:
     #Order matters in using the dict
-    def __init__(self,samplerate=44100,channels=1,audioUnits=dict()) -> None:
+    def __init__(self,samplerate=44100,channels=1,audioUnits=list(),anim = False) -> None:
         self.pyAudio = pyaudio.PyAudio()
         self.bufferSize = 1024
         self.stream = self.pyAudio.open(format=pyaudio.paFloat32,rate=samplerate,channels=channels,input=True,output=True,frames_per_buffer=self.bufferSize)
         self.audioUnits = audioUnits
+        self.anim = anim
 
-    def processor(self):
-        while True:
-            buffer = [0] * (self.bufferSize*4)
+    def processor(self,i=0):
+        if not self.anim:
+            while True:
+                buffer = [0] * (self.bufferSize*4)
+                for i in range(self.bufferSize):
+                    self.audioUnits[1].writeSample(self.audioUnits[0].get_sample())
+                    buffer[i] += self.audioUnits[1].readSample()*0.75
+
+                self.stream.write(np.array(buffer).astype(np.float32))
+        else:
+            bufferA = [0] * (self.bufferSize*4)
+            bufferB = [0] * (self.bufferSize*4)
             for i in range(self.bufferSize):
-                for key,audioUnit in self.audioUnits.items():
-                    buffer[i] += audioUnit.get_sample()*(1/len(self.audioUnits))*1
+                bufferA[i] = self.audioUnits[0].get_sample()
+                self.audioUnits[1].writeSample(bufferA[i])
+                bufferB[i] = self.audioUnits[1].readSample()
 
-            self.stream.write(np.array(buffer).astype(np.float32))
+
+            plt.cla()
+            plt.plot(bufferA[:self.bufferSize])
+            plt.plot(bufferB[:self.bufferSize])
+            plt.tight_layout()
+
 
     def killProcess(self):
         self.stream.stop_stream()
         self.stream.close()
         self.pyAudio.terminate()
 
-    def addAudioUnit(self,unitID,unitType):
-        unit = None
-        if "oscillator" in unitType:
-            unit = Synth()
-            self.audioUnits.update({unitID:unit})
-
-    def removeAudioUnit(self,unitID):
-        del self.audioUnits[unitID]
-
-    def findAudioUnit(self,unitID):
-        print(unitID,self.audioUnits.keys())
-        if unitID not in self.audioUnits.keys():
-            for key in self.audioUnits.keys():
-                print(key.getModulators().keys())
-                for subKey in self.audioUnits[key].getModulators().keys():
-                    print(subKey)
-                    if subKey == unitID:
-                        return key
-        else:
-            return unitID
-
-    def changeAudioUnitProperty(self,unitID,property,value):
-        print(unitID,value)
-        foundKey = self.findAudioUnit(unitID)
-        print(foundKey)
-        if foundKey == unitID:
-            self.audioUnits[unitID].changeProperty(property,value)
-        else:
-            self.audioUnits[foundKey].modifyModulator(unitID,property,value)
-
-    def changeAudioUnitOutput(self,unitID,value):
-        print(unitID,value,self.audioUnits.keys())
-        if unitID not in self.audioUnits.keys() and "direct out" in value:
-            for key,audioUnit in self.audioUnits.items():
-                if unitID in audioUnit.getModulators().keys():
-                    self.audioUnits.update({unitID:audioUnit.getModulatorValue(unitID)})
-                    audioUnit.removeInput(unitID)
-                    break
-        elif unitID not in self.audioUnits.keys():
-            currentunit = None
-            targetunit = None
-            for key,audioUnit in self.audioUnits.items():
-                if unitID in audioUnit.getModulators().keys():
-                    currentunit = key
-                if value in audioUnit.getModulators().keys():
-                    targetunit = key
-            if targetunit == None:
-                self.audioUnits[value].addInput(unitID,self.audioUnits[currentunit].getModulatorValue(unitID))
-                self.audioUnits[currentunit].removeInput(unitID)
-        elif value in self.audioUnits.keys():
-            self.audioUnits[value].addInput(unitID,self.audioUnits[unitID])
-            del self.audioUnits[unitID]
-        print(unitID,value,self.audioUnits.keys())
-
-    
 if __name__ == "__main__":
-    processor = AudioProcessor()
-    audioThread = td.Thread(target=processor.processor,daemon=True)
-    audioThread.start()
-    try:
-        app.run("127.0.0.1", 8080, True)
-        while audioThread.is_alive():
-            audioThread.join(1)
-    except KeyboardInterrupt:
-        exit()
-    
+    processor = AudioProcessor(audioUnits=[Sine(220,44100,phase=0),PitchShifter()],anim=True)
+    # audioThread = td.Thread(target=processor.processor,daemon=True)
+    # audioThread.start()
+    # try:
+    #     while audioThread.is_alive():
+    #         audioThread.join(1)
+    # except KeyboardInterrupt:
+    #     exit()
+    ani = FuncAnimation(plt.gcf(),processor.processor,interval=25)
+    plt.tight_layout()
+    plt.show()
