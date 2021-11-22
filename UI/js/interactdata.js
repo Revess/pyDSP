@@ -2,60 +2,13 @@ function findName(object, breaker) {
     var name = "";
     let parent = object;
     while (name.length == 0) {
-        id = parent.parentElement.id.toString()
+        let id = parent.parentElement.id
         if (id.includes(breaker)) {
             name = id;
         }
         parent = parent.parentElement;
     }
     return name
-}
-
-function checkOutputList() {
-    allCards = document.querySelectorAll(".project-box")
-    allCards.forEach((outerElement, i) => {
-        allCards.forEach((innerElement, j) => {
-            console.log(outerElement, innerElement);
-            // let outputElements = e.querySelectorAll(".output")[0].children[0].children[1].children;
-            // let found = false;
-            // for (k = 0; k < outputElements.length; k++) {
-            //     if (outputElements[k].innerHTML == el.parentElement.id) {
-            //         found = true;
-            //     }
-            // }
-            // if (i !== j && !found) {
-            //     let newItem = document.createElement("a");
-            //     newItem.classList = "dropdown-item";
-            //     newItem.onclick = function () { changeOutput(this) };
-            //     newItem.innerHTML = el.parentElement.id;
-            //     e.querySelectorAll(".output")[0].children[0].children[1].appendChild(newItem);
-            // }
-            // if (i !== j) {
-            //     inputs = [".FM-slider", ".AM-slider", ".RM-slider"]
-            //     inputs.forEach(element => {
-            //         inputList = document.getElementById(el.parentElement.id).querySelectorAll(element)[0].children[0].children[0].children
-            //         for (k = 0; k < inputList[1].children.length; k++) {
-            //             if (inputList[1].children[k].innerHTML == e.parentElement.id) {
-            //                 inputList[0].innerHTML = element.replace(".", "").replace("-slider", "")
-            //                 inputList[1].removeChild(inputList[1].children[k])
-            //             }
-            //         }
-            //     });
-            // }
-        });
-    });
-}
-
-function removeFromOutputList(object) {
-    allCards = document.querySelectorAll(".output")
-    allCards.forEach(element => {
-        EChilds = element.children[0].children[1].children
-        for (i = 0; i < EChilds.length; i++) {
-            if (EChilds[i].innerHTML == object) {
-                element.children[0].children[1].removeChild(EChilds[i])
-            }
-        }
-    });
 }
 
 function frequencyChange(object) {
@@ -105,13 +58,39 @@ function changeOutput(object) {
     //When choosing a target:
     //Remove this name from the target output
     //Add this name to the target inputs
-    let previousTarget = object.parentElement.parentElement.children[0].innerText
+    let previousTarget = object.parentElement.parentElement.children[0].innerHTML
+    let objectID = findName(object, "Oscillator")
+    console.log("previousTarget: " + previousTarget)
+    console.log("newTarget: " + object.innerHTML)
+    console.log("currentObject: " + objectID)
     if (!previousTarget.includes("Direct Out")) {
-        if (object.innerText == "Direct Out" || object.innerText !== previousTarget) {
-            console.log(previousTarget)
-            targetElement = document.getElementById(previousTarget).querySelectorAll(".output")[0].children[0].children[1].removeChild(object)
+        if (object.innerHTML.includes("Direct Out") || !object.innerHTML.includes(previousTarget)) {
+            targetElement = document.getElementById(previousTarget).querySelectorAll(".output")[0].children[0].children[1]
+            let newNode = object.cloneNode(true)
+            newNode.innerHTML = findName(object, "Oscillator")
+            newNode.onclick = function () { changeOutput(this) };
+            targetElement.appendChild(newNode)
+        }
+        if (!object.innerHTML.includes(previousTarget) && !object.innerHTML.includes("Direct Out")) {
+            targetElement = document.getElementById(object.innerHTML).querySelectorAll(".output")[0].children[0].children[1]
+            for (i = 0; i < targetElement.children.length; i++) {
+                if (targetElement.children[i].innerHTML.includes(objectID)) {
+                    targetElement.removeChild(targetElement.children[i])
+                }
+            }
+        }
+    } else {
+        targetElement = document.getElementById(object.innerHTML).querySelectorAll(".output")[0].children[0].children[1]
+        for (i = 0; i < targetElement.children.length; i++) {
+            if (targetElement.children[i].innerHTML.includes(objectID)) {
+                targetElement.removeChild(targetElement.children[i])
+            }
         }
     }
+
+    object.parentElement.parentElement.children[0].innerHTML = object.innerHTML
+    sendData(["oscOutput", findName(object, "Oscillator"), object.innerHTML])
+    object.innerHTML = previousTarget
 
     // object.parentElement.parentElement.children[0].innerHTML = object.innerHTML
     // if (object.innerHTML.includes("Direct Out")) {
@@ -128,7 +107,6 @@ function changeOutput(object) {
     //     });
     // }
 
-    sendData(["oscOutput", findName(object, "Oscillator"), object.innerHTML])
 }
 
 function changeWaveForm(object) {

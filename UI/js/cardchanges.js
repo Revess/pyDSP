@@ -12,43 +12,40 @@ function focusBox(element) {
 function removeObject() {
     if (focussedBox !== null) {
         document.getElementById("cardHolder").removeChild(document.getElementById(focussedBox));
-        // removeFromOutputList(focussedBox)
         sendData(["removeNode", focussedBox]);
         focussedBox = null;
     }
 }
 
-async function addCard(object) {
+function addCard(object) {
     let newNode = document.createElement("div");
-    let audioType = "";
     newNode.id = object + cardNum;
     newNode.classList = "col-md-4 mt-5 mb-5";
     document.getElementById("cardHolder").appendChild(newNode)
     $("#" + object + cardNum).load("../blocks/" + object + ".html", function () {
-        allCards = document.querySelectorAll(".project-box")
-        allCards.forEach((outerElement, i) => {
-            allCards.forEach((innerElement, j) => {
-                let outputElements = outerElement.querySelectorAll(".output")[0].children[0].children[1].children;
-                let found = false;
-                for (k = 0; k < outputElements.length; k++) {
-                    if (outputElements[k].innerHTML == innerElement.parentElement.id) {
-                        found = true;
-                    }
-                }
-                if (i !== j && !found) {
-                    let newItem = document.createElement("a");
-                    newItem.classList = "dropdown-item";
-                    newItem.onclick = function () { changeOutput(this) };
-                    newItem.innerHTML = innerElement.parentElement.id;
-                    outerElement.querySelectorAll(".output")[0].children[0].children[1].appendChild(newItem);
-                }
-            });
+        let thisObject = document.getElementById(object + cardNum)
+        let allCards = document.querySelectorAll(".project-box")
+        allCards.forEach((element, i) => {
+            if (!element.parentElement.id.includes(object + cardNum)) {
+                let outputs = element.querySelectorAll(".output")[0].children[0].children[1];
+                let newNode = document.createElement("a");
+                newNode.classList = "dropdown-item";
+                newNode.onclick = function () { changeOutput(this) };
+                newNode.innerHTML = object + cardNum;
+                outputs.appendChild(newNode);
+                newNode = document.createElement("a");
+                newNode.classList = "dropdown-item";
+                newNode.onclick = function () { changeOutput(this) };
+                newNode.innerHTML = element.parentElement.id;
+                thisObject.querySelectorAll(".output")[0].children[0].children[1].appendChild(newNode)
+            }
         });
+        document.getElementById(object + cardNum).children[0].children[0].children[0].children[0].innerHTML = newNode.children[0].children[0].children[0].children[0].innerHTML + cardNum;
+        if (object.includes("Oscillator")) {
+            sendData(["newNode", newNode.id, "oscillator sine"]);
+        } else if (object.includes("Modulator")) {
+            sendData(["newNode", newNode.id, "modulator"]);
+        }
+        cardNum += 1;
     });
-    if (object.includes("Oscillator")) {
-        sendData(["newNode", newNode.id, "oscillator sine"]);
-    } else if (object.includes("Modulator")) {
-        sendData(["newNode", newNode.id, "modulator"]);
-    }
-    cardNum += 1;
 }

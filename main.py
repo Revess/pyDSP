@@ -61,7 +61,7 @@ class AudioProcessor:
             buffer = [0] * (self.bufferSize*4)
             for i in range(self.bufferSize):
                 for key,audioUnit in self.audioUnits.items():
-                    buffer[i] += audioUnit.get_sample()*(1/len(self.audioUnits))
+                    buffer[i] += audioUnit.get_sample()*(1/len(self.audioUnits))*1
 
             self.stream.write(np.array(buffer).astype(np.float32))
 
@@ -80,31 +80,50 @@ class AudioProcessor:
         del self.audioUnits[unitID]
 
     def findAudioUnit(self,unitID):
+        print(unitID,self.audioUnits.keys())
         if unitID not in self.audioUnits.keys():
             for key in self.audioUnits.keys():
+                print(key.getModulators().keys())
                 for subKey in self.audioUnits[key].getModulators().keys():
+                    print(subKey)
                     if subKey == unitID:
                         return key
         else:
             return unitID
 
     def changeAudioUnitProperty(self,unitID,property,value):
+        print(unitID,value)
         foundKey = self.findAudioUnit(unitID)
+        print(foundKey)
         if foundKey == unitID:
             self.audioUnits[unitID].changeProperty(property,value)
         else:
             self.audioUnits[foundKey].modifyModulator(unitID,property,value)
 
     def changeAudioUnitOutput(self,unitID,value):
+        print(unitID,value,self.audioUnits.keys())
         if unitID not in self.audioUnits.keys() and "direct out" in value:
             for key,audioUnit in self.audioUnits.items():
                 if unitID in audioUnit.getModulators().keys():
                     self.audioUnits.update({unitID:audioUnit.getModulatorValue(unitID)})
                     audioUnit.removeInput(unitID)
                     break
+        elif unitID not in self.audioUnits.keys():
+            currentunit = None
+            targetunit = None
+            for key,audioUnit in self.audioUnits.items():
+                if unitID in audioUnit.getModulators().keys():
+                    currentunit = key
+                if value in audioUnit.getModulators().keys():
+                    targetunit = key
+            if targetunit == None:
+                self.audioUnits[value].addInput(unitID,self.audioUnits[currentunit].getModulatorValue(unitID))
+                self.audioUnits[currentunit].removeInput(unitID)
         elif value in self.audioUnits.keys():
             self.audioUnits[value].addInput(unitID,self.audioUnits[unitID])
             del self.audioUnits[unitID]
+        print(unitID,value,self.audioUnits.keys())
+
     
 if __name__ == "__main__":
     processor = AudioProcessor()

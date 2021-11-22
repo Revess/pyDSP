@@ -32,25 +32,25 @@ class Synth:
         elif "sine" in self.waveform:
             self.voices.append(Sine(self.frequency,self.samplerate,self.angle))
         self.setFrequency(self.frequency)
+        
+    def removeVoice(self):
+        self.voices.pop()
+        self.setFrequency(self.frequency)
 
     def addInput(self,unitID,item):
         self.modulators.update({unitID:[[""],item]})
 
-    def modifyModulator(self,unitID,property,value):
-        self.modulators[unitID][1].changeProperty(property,value)
-
     def removeInput(self,unitID):
         del self.modulators[unitID]
+
+    def modifyModulator(self,unitID,property,value):
+        self.modulators[unitID][1].changeProperty(property,value)
 
     def getModulatorValue(self,unitID):
         return self.modulators[unitID][1]
 
     def getModulators(self):
         return self.modulators
-
-    def removeVoice(self):
-        self.voices.pop()
-        self.setFrequency(self.frequency)
 
     def setFrequency(self,frequency):
         self.frequency = frequency
@@ -123,7 +123,6 @@ class Synth:
         return self.angle
 
     def changeProperty(self,property,value):
-        print(property,value)
         if "frequency" in property:
             self.setFrequency(float(value))
         elif "volume" in property:
