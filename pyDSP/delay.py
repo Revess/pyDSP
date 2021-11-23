@@ -14,7 +14,7 @@ class DelayLine:
         return sample
 
     def writeSample(self,sample):
-        self.delayLine[self.writeHead] = sample #(self.delayLine[self.writeHead]*self.feedback)
+        self.delayLine[self.writeHead] = sample + (self.delayLine[self.writeHead]*self.feedback)
         self.writeHead+=1
         self.writeHead%=self.delayLength
 
