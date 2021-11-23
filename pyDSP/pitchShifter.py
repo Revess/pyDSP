@@ -1,31 +1,41 @@
-from math import fmod
+from math import cos,pi
 
 class PitchShifter:
-    def __init__(self,speed=0.5) -> None:
-        self.speed = 1/(1-speed)
-        self.delayLength = 1
-        while round(fmod(self.delayLength,self.speed),2) != 0.0:
-            self.delayLength+=1
-            if self.delayLength >= 20 and round(fmod(self.delayLength,self.speed),2) < 0.5:
-                break
+    def __init__(self,ferquency=2,samplerate=44100,speed=0.5) -> None:
+        self.samplerate=samplerate
+        self.delayLine = [0] * (round(samplerate/10)+1)
+        self.phase = 0
+        self.step = ferquency/self.samplerate
 
-        print(self.delayLength)
-        self.delayLength*=2
-
-        self.delayLine = [0] * self.delayLength
-        self.writeHead = 0
-        self.readHead = 0
+        self.writeHead = round(samplerate/10)-1
+        self.previousSample = 0
 
     def readSample(self):
-        sample = self.delayLine[self.readHead]
-        self.readHead+=1
-        self.readHead%=self.delayLength
+        if self.phase >= 1:
+            self.phase -= 1
+        sample = 0
+
+        delayLength = round((self.samplerate/10)*self.phase)
+        if delayLength == 0:
+            delayLength = 1
+        sample += self.delayLine[delayLength]*cos(((self.phase-0.5)/2)*(pi*2))
+
+        delayLength = round((self.samplerate/10)*((self.phase+0.5)%1))
+        if delayLength == 0:
+            delayLength = 1
+        sample += self.delayLine[delayLength]*cos(((((self.phase+0.5)%1)-0.5)/2)*(pi*2))
+
+        sample /= 2
+        sample = self.previousSample-(0.5*(self.previousSample-sample))
+
+        self.previousSample = sample
+        self.phase += self.step
         return sample
 
-
     def writeSample(self,sample):
-        for i in range(int(self.delayLength/2)):
-            self.delayLine[(self.writeHead+i)%self.delayLength] = (sample * (((self.delayLength-1)-i)/(self.delayLength-1)))+self.delayLine[(self.writeHead+i)%self.delayLength]
-            self.delayLine[(self.writeHead+i)%self.delayLength] = self.delayLine[(self.writeHead+i)%self.delayLength]/2
+        self.delayLine[self.writeHead] = sample
         self.writeHead+=1
-        self.writeHead%=self.delayLength
+        self.writeHead%=round(self.samplerate/10)
+
+    def changePitch(self,pitch):
+        self.step = pitch/self.samplerate
