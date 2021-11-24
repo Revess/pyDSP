@@ -1,11 +1,9 @@
 import pyaudio
 import numpy as np
 import threading as td
-from pyDSP.waves.waveforms import *
-from pyDSP.filters.lowPass import LowPass
+from pyDSP.filters.IIR.filter import *
 import matplotlib.pyplot as plt
 import os
-import scipy.fftpack
 
 SAMPLERATE = 44100
 
@@ -51,7 +49,16 @@ class AudioProcessor:
 
 def commands():
     while True:
-        Lp.setCutoff(int(input(">>")))
+        inp = input(">>").split()
+        if inp[0] == "c":
+            if len(inp) == 3:
+                FILT.setCutoff(int(inp[1]),int(inp[2]))
+            else:
+                FILT.setCutoff(int(inp[1]))
+        elif inp[0] == "t":
+                FILT.setFilterType(inp[1])
+        elif inp[0] == "n":
+            FILT.setNTaps(int(inp[1]))
 
 def emptyPlots():
     files = os.listdir("./plots/")
@@ -63,8 +70,8 @@ def emptyPlots():
 
 if __name__ == "__main__":
     emptyPlots()
-    Lp = LowPass(4000,44100)
-    processor = AudioProcessor(audioUnits=[Saw(440,SAMPLERATE),Lp],drawOutput=True)
+    FILT = Filter()
+    processor = AudioProcessor(audioUnits=[Saw(100,SAMPLERATE),FILT],drawOutput=False)
     audioThread = td.Thread(target=processor.processor,daemon=True)
     commandLine = td.Thread(target=commands,daemon=True)
     plt.tight_layout()
