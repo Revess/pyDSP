@@ -2,28 +2,37 @@ from math import pi
 from ..audioUnit import AudioUnit
 
 class LowPass(AudioUnit):
-    def __init__(self,cutoff,samplerate,nSamples=1000):
+    def __init__(self, filterDesign = "LPF", cutoffl=440, cutoffH=880, samplerate=44100, nTaps=1000):
         super().__init__(samplerate)
-        self.cutoff = cutoff
-        self.dt = 1/self.samplerate
-        self.rc = (1/(self.cutoff*2*pi))
-        self.alpha = self.dt/(self.rc+self.dt)
-        self.delayLine = [0] * nSamples
-        self.nSamples = nSamples
-        self.pointer = 0
+        self.nTaps = nTaps
+        self.taps = [0]*nTaps
+        self.sr = [0]*nTaps
+        self.cutoff = cutoffl
+        self.cutoffH = cutoffH
+        self.lambdaC = pi*self.cutoff / (self.samplerate/2)
+        self.phi = pi*self.cutoffH / (self.samplerate/2)
+        if filterDesign == "LPF":
+            self.designLPF()
+        elif filterDesign == "HPF":
+            self.designHPF()
+        elif filterDesign == "BPF":
+            self.designBPF()
 
     def get_sample(self, sample):
-        self.delayLine[self.pointer] = self.delayLine[self.pointer-1] + (self.alpha*(sample - self.delayLine[self.pointer-1]))
-        self.pointer+=1
-        self.pointer%=self.nSamples
-        return self.delayLine[self.pointer]
+        pass
 
     def setCutoff(self,cutoff):
-        self.cutoff = cutoff
-        self.rc = (1/(self.cutoff*2*pi))
-        self.alpha = self.dt/(self.rc+self.dt)
+        pass
 
     def changeSamplerate(self, samplerate):
         super().changeSamplerate(samplerate)
-        self.dt = 1/self.samplerate
-        self.alpha = self.dt/(self.rc+self.dt)
+        pass
+
+    def designLPF(self):
+        pass
+
+    def designHPF(self):
+        pass
+
+    def designBPF(self):
+        pass
