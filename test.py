@@ -1,10 +1,10 @@
-from math import pi,sin,cos,sqrt
+from math import pi,sin,cos,sqrt,e,log10
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-Q = 1.5
-FFREQ = 100
-GAIN = 1.2
+Q = 1
+FFREQ = 5000
+GAIN = 1
 SAMPLERATE = 44100
 
 NSAMPS = 1000
@@ -24,6 +24,26 @@ delayLine = [0] * 4
 a0 = 1 + ALPHA
 b0 = ((1-CS) / 2)/a0
 coefficients = [(1 - CS)/a0,((1-CS) / 2)/a0,(-2 * CS)/a0,(1 - ALPHA)/a0]
+
+BINSIZE = 512  # number of frequency points
+FSTEP = (SAMPLERATE/2) / BINSIZE  # distance between two frequency points
+
+H = [0] * BINSIZE
+for n in range(BINSIZE):
+    f0 = n*FSTEP
+    z = e**(2j*pi*f0/SAMPLERATE)
+
+    num = b0 + coefficients[0]/z + coefficients[1]/z**2
+    denom = a0 + coefficients[2]/z + coefficients[3]/z**2
+    H[n]=abs(num/denom)
+
+# Now just do the plotting
+frange = [i*FSTEP for i in range(round((SAMPLERATE/2)/FSTEP))]
+plt.plot(frange, [20*log10(h) for h in H])
+plt.ylim((-30,5))
+plt.grid(True)
+plt.show()
+exit()
 
 ##Start generateting
 phase = 0
