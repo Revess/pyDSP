@@ -19,7 +19,7 @@ class Oscillator:
         elif self.angle <= 0:
             self.angle +=0.00001
 
-    def get_sample(self):
+    def readSample(self):
         self.phase+=self.step
         if self.phase >= 1:
             self.phase-=1

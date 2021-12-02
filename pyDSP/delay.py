@@ -1,11 +1,13 @@
-class DelayLine:
-    def __init__(self,samplerate,feedback,length) -> None:
+from .audioUnit import AudioUnit
+
+class DelayLine(AudioUnit):
+    def __init__(self,samplerate,feedback,lengthInMS) -> None:
+        super().__init__(samplerate)
         self.delayLine = [0] * (samplerate*5)
-        self.delayLength = length
+        self.delayLength = round((samplerate/1000)*(lengthInMS+1))
         self.readHead = 0
         self.writeHead = len(self.delayLine)-1
         self.feedback = feedback
-        self.samplerate = samplerate
 
     def readSample(self):
         sample = self.delayLine[self.readHead]

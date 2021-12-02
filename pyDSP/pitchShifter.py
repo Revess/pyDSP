@@ -1,8 +1,9 @@
 from math import cos,pi
+from .audioUnit import AudioUnit
 
-class PitchShifter:
+class PitchShifter(AudioUnit):
     def __init__(self,ferquency=2,samplerate=44100,speed=0.5) -> None:
-        self.samplerate=samplerate
+        super().__init__(samplerate)
         self.delayLine = [0] * (round(samplerate/10)+1)
         self.phase = 0
         self.step = ferquency/self.samplerate

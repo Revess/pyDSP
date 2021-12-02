@@ -2,8 +2,11 @@ class AudioUnit:
     def __init__(self,samplerate):
         self.samplerate = samplerate
 
-    def get_sample(self):
+    def readSample(self):
         return 0
 
-    def changeSamplerate(self,samplerate):
+    def writeSample(self,sample):
+        pass
+
+    def setSamplerate(self,samplerate):
         self.samplerate = samplerate
