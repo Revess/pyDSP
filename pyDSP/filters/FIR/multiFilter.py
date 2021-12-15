@@ -3,7 +3,7 @@ from .highPass import *
 from .lowPass import *
 from ...audioUnit import *
 
-class MultiFilter(AudioUnit):
+class FIRMultiFilter(AudioUnit):
     def __init__(self, filterDesign = "LPF", cutoff=500, cutoffH=880, samplerate=44100, nTaps=None):
         super().__init__(samplerate)
         self.type = filterDesign

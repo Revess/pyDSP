@@ -12,7 +12,7 @@ class AllPassVerb2(AudioUnit):
             APF(samplerate,initialFeedback,round(initialDelaySamples*0.7)+1),
             APF(samplerate,initialFeedback,round(initialDelaySamples*0.6)+1),
             APF(samplerate,initialFeedback,round(initialDelaySamples*0.3)+1),
-            DelayLine(samplerate,initialFeedback*0.4,initialDelaySamples/(samplerate/1000)),
+            DelayLine(samplerate,initialFeedback*0.4,lengthInSamples=initialDelaySamples),
             APF(samplerate,initialFeedback,round(initialDelaySamples*0.7)+1),
             APF(samplerate,initialFeedback,round(initialDelaySamples*0.3)+1)
             ]

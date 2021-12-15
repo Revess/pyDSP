@@ -1,7 +1,7 @@
 from ...audioUnit import AudioUnit
 from .biquad import Biquad
 
-class MultiFilter(AudioUnit):
+class IIRMultiFilter(AudioUnit):
     def __init__(self,samplerate,filters={"LPF1":["LPF",220,1,1]}) -> None:
         super().__init__(samplerate)
         self.filters = dict()
