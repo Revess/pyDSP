@@ -1,4 +1,4 @@
-from .audioUnit import AudioUnit
+from .audioUnit import *
 
 class DelayLine(AudioUnit):
     def __init__(self,samplerate,feedback,lengthInSamples=None,lengthInMS=None) -> None:

@@ -1,5 +1,5 @@
 from math import cos,pi
-from .audioUnit import AudioUnit
+from .audioUnit import *
 
 class PitchShifter(AudioUnit):
     def __init__(self,ferquency=2,samplerate=44100,speed=0.5) -> None:

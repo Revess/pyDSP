@@ -1,16 +1,16 @@
 from math import pi
 from random import random
-import numpy as np
+from ..audioUnit import *
 
-class Oscillator:
-    def __init__(self,frequency,sampleRate,angle=0.5,volume=1,phase=None) -> None:
+class Oscillator(AudioUnit):
+    def __init__(self,frequency,samplerate,angle=0.5,volume=1,phase=None):
+        super().__init__(samplerate)
         self.TWO_PI = 2*pi
         if phase is not None:
             self.phase = phase
         else:
             self.phase = random()
         self.frequency = frequency
-        self.sampleRate = sampleRate
         self.step = self.frequency/self.sampleRate
         self.volume = volume
         self.angle = angle
