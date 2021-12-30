@@ -1,6 +1,6 @@
 import pyaudio
 import numpy as np
-from pyDSP.reverb.schroederVerb import *
+from pyDSP.synth.synth import *
 import threading as td
 
 SAMPLERATE = 44100
@@ -37,7 +37,7 @@ def commands():
             exit()
 
 if __name__ == "__main__":
-    processor = AudioProcessor(audioTrack=[SchoederVerb(SAMPLERATE)])
+    processor = AudioProcessor(audioTrack=[OscillatorModule(44100,4,0.5,440)])
     audioThread = td.Thread(target=processor.processor,daemon=True)
     commandLine = td.Thread(target=commands,daemon=True)
     audioThread.start()

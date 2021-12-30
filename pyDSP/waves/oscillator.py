@@ -11,7 +11,7 @@ class Oscillator(AudioUnit):
         else:
             self.phase = random()
         self.frequency = frequency
-        self.step = self.frequency/self.sampleRate
+        self.step = self.frequency/self.samplerate
         self.volume = volume
         self.angle = angle
         if self.angle >= 1:
@@ -30,7 +30,7 @@ class Oscillator(AudioUnit):
 
     def setFrequecy(self,frequency):
         self.frequency = frequency
-        self.step = self.frequency/self.sampleRate
+        self.step = self.frequency/self.samplerate
 
     def setVolume(self,volume):
         self.volume = volume

@@ -17,9 +17,9 @@ class Synth:
         self.noteManager.noteOn(note,velocity)
         frequency = self.noteManager.getNote(note)
 
-
     def noteOff(self,note):
         self.noteManager.noteOff(note)
+
 
 class NoteManager:
     def __init__(self,voices):
@@ -40,12 +40,13 @@ class NoteManager:
     def getNotes(self):
         return [2**((note-69)/12)*440 for note in self.notes.keys()]
 
+
 class OscillatorModule(AudioUnit):
     def __init__(self,samplerate,voices,detune, frequency, waveform="Sine"):
         super().__init__(samplerate)
         self.maxDetuneRatio = 20
         self.detune = detune*self.maxDetuneRatio
-        self.waveform = waveform
+        self.waveform = waveform.lower()
         self.frequency = frequency
         self.voices = [None]*voices
         self.setWaveForm(waveform)
@@ -64,15 +65,15 @@ class OscillatorModule(AudioUnit):
         self.setFrequency()
     
     def setWaveForm(self,waveform):
-        match waveform.lower():
-            case "sine":
-                self.voices = [Sine(self.frequency, self.samplerate) for index in self.voices]
-            case "saw":
-                self.voices = [Saw(self.frequency, self.samplerate) for index in self.voices]
-            case "square":
-                self.voices = [Square(self.frequency, self.samplerate) for index in self.voices]
-            case "triangle":
-                self.voices = [Triangle(self.frequency, self.samplerate) for index in self.voices]
+        self.waveform = waveform.lower()
+        if self.waveform == "sine":
+            self.voices = [Sine(self.frequency, self.samplerate) for index in self.voices]
+        if self.waveform == "saw":
+            self.voices = [Saw(self.frequency, self.samplerate) for index in self.voices]
+        if self.waveform == "square":
+            self.voices = [Square(self.frequency, self.samplerate) for index in self.voices]
+        if self.waveform == "triangle":
+            self.voices = [Triangle(self.frequency, self.samplerate) for index in self.voices]
         self.setFrequency()
 
     def setVoices(self,voices):
@@ -82,5 +83,3 @@ class OscillatorModule(AudioUnit):
         elif len(self.voices) > voices:
             self.voices[:voices]
         self.setFrequency()
-
-OscillatorModule(44100,4,0.5,440)
